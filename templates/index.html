@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mafia_chat</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        #top-bar {
+            background-color: #24020a;
+            color: #e7e7e7;
+            padding: 10px;
+            text-align: center;
+        }
+
+        #chat-container {
+            padding: 10px;
+            height: calc(100vh - 150px);
+            overflow-y: scroll;
+        }
+
+        #chat-container p {
+            background-color: #e332327f;
+            padding: 10px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+
+        #input-container {
+            display: flex;
+            align-items: center;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #24020a;
+            padding: 10px;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        #input-container input[type="text"] {
+            padding: 10px;
+            border: none;
+            border-radius: 15px;
+            outline: none;
+            flex: 1;
+        }
+
+        #input-container input#usuario {
+            margin-right: 10px;
+            width: 30%;
+        }
+
+        #input-container input#mensagem {
+            flex: 1;
+        }
+
+        #input-container button {
+            padding: 10px 20px;
+            background-color: #e332327f;
+            color: #e7e7e7;
+            border-radius: 15px;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.1/socket.io.js" integrity="sha512-Z6C1p1NIexPj5MsVUunW4pg7uMX6/TT3CUVldmjXx2kpip1eZcrAnxIusDxyFIikyM9A61zOVNgvLr/TGudOQg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+    <div id="top-bar">
+        <h1>Nosso chat fml</h1>
+    </div>
+
+    <div id="chat-container">
+    </div>
+
+    <div id="input-container">
+        <input type="text" id="usuario" placeholder="Usuario" required>
+        <div style="width: 10px;"></div>
+        <input type="text" id="mensagem" placeholder="Mensagem" required>
+        <button id="botao">Enviar</button>
+    </div>
+
+    <script type="text/javascript">
+        $(document).ready(function() { /* ESSE CODIGO SÓ VAI SER RODADO QUANDO A PAGINA ESTIVER PRONTA, POR ISSO O $(document).ready */
+            var socket = io("192.168.15.5:5000")
+            socket.on("connect", function() { /* SERVE PARA ATIVAR A AÇÃO */
+                console.log("conectou"); /* ISSO SÓ SERVE PARA INDICAR SE FOI FEITA A AÇÃO, E ISSO APARECE NO (console) DA PAGINA */
+            });
+
+            socket.on("message", function(data) { /* (data) SERVE PARA A FUNÇÃO RECEBER OS DADOS QUE ESTÃO SENDO ENVIADOS */
+                console.log("enviou mensagem");
+                $("#chat-container").append($('<p>').text(data)); /* AQUI VAI ADICIONAR UMA TEXTO NO CONTAINER DO CHAT NO PARAGRAFO */
+                // Scroll to the bottom of the chat container
+                $("#chat-container").scrollTop($("#chat-container")[0].scrollHeight);
+            });
+
+            $("#botao").on('click', function() { /* ESSE CODIGO É REFERENTE A QUANDO CLICAR NO BOTÃO */
+                console.log("clicou botao"); /* ISSO SÓ SERVE PARA INDICAR SE FOI FEITA A AÇÃO, E ISSO APARECE NO (console) DA PAGINA */
+                socket.send($('#usuario').val() + ": " + $('#mensagem').val()); /* ISSO ATIVA O (socket.on) QUE ESTÁ ACIMA */ /* (.val()) PEGA O VALOR */
+                $('#mensagem').val(''); /* AQUI SERVE DEIXAR O CAMPO VAZIO DEPOIS DE ENVIAR */
+            });
+            $("#mensagem").on('keypress', function() {
+                if (event.key === "Enter") {
+                    console.log("deu enter");
+                    socket.send($('#usuario').val() + ": " + $('#mensagem').val());
+                    $('#mensagem').val('');
+                }
+            });
+        });
+    </script>
+
+    <!-- CDNJS É O MELHOR SITE PARA IMPORTAR FERRAMENTAS PARA O HTML -->
+</body>
+</html>
